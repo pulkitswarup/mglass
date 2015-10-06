@@ -1,0 +1,195 @@
+DELETE /mglass/movie
+
+PUT /mglass
+{
+  "_routing" : true,
+  "mappings": {
+     "movies": {
+        "_routing": {
+          "required": true
+        },
+        "properties": {
+           "genre": {
+              "type": "string"
+           },
+           "id": {
+              "type": "long"
+           },
+           "title": {
+              "type": "string"
+           },
+           "year": {
+              "type": "integer"
+           }
+        }
+     }
+  }
+}
+
+GET /mglass/_mapping
+
+GET /mglass/movies/_search
+
+PUT /mglass/_mapping/ratings
+{
+  "ratings": {
+      "_parent": {
+        "type": "movies"
+      }
+    }
+}
+
+
+GET /mglass/_mapping
+
+DELETE /mglass/_mapping/ratings
+
+PUT /mglass/_mapping/ratings
+{
+  "ratings" : {
+    "properties" : {
+     "rating" : {
+        "type" : "double",
+        "index": "not_analyzed"
+      },
+      "timestamp" : {
+        "type" :    "date",
+        "format": "YYYY-MM-dd HH:mm:ss",
+        "index":    "not_analyzed"
+      }
+    },
+    "_parent" : {
+      "type": "movies"
+    },
+    "_routing" : {
+      "required" : true
+    }
+  }
+}
+
+GET /mglass/_mapping/ratings
+
+PUT /mglass/_mapping/recommendations
+{
+  "recommendations" : {
+    "properties" : {
+      "movieid" : {
+        "type" : "long"
+      },
+      "recommendedid" : {
+        "type" : "long"
+      },
+      "score" : {
+        "type" : "double"
+      },
+      "timestamp" : {
+        "type" :    "date",
+        "format": "YYYY-MM-dd HH:mm:ss",
+        "index":    "not_analyzed"
+      }
+    },
+    "_parent" : {
+      "type": "movies"
+    },
+    "_routing" : {
+      "required" : true
+    }
+  }
+}
+
+DELETE /mglass/recommendations/1_892?routing=1
+
+GET /mglass/recommendations/_search
+
+GET /mglass/movies/_search
+{
+  "query": {
+    "match": {
+      "_id": "3194"
+    }
+  }
+}
+
+POST /mglass/movies/_search
+{
+  "size":2,
+  "query": {
+    "filtered": {
+      "query": {
+        "bool": {
+          "should":[
+            {
+              "match": {
+                "content": {
+                  "genre": "drama"
+                  "boost": 10
+                }
+              }
+            }
+            ]
+        }
+      },
+      "filter": {
+        "and": [
+          {
+            "has_child": {
+              "type": "recommendations",
+              "filter": {
+                "and": [
+                  {
+                    "terms": {
+                      "recommendedid": [
+                        "3194"
+                      ]
+                    }
+                  },
+                  {
+                    "range": {
+                      "score": {
+                        "gte": 0.95
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+
+  POST /mglass/movies/_search
+{
+  "query": {
+  "has_child" : {
+        "type" : "recommendations",
+        "query" : {
+            "term" : {
+                "recommendedid" : "61160"
+            }
+        }
+    }
+  }
+}
+
+DELETE  /mglass/ratings
+
+GET /mglass/ratings/_search
+
+POST /mglass/ratings/_search
+{
+  "query": {
+    "match": {
+      "movieid": "3193"
+    }
+  },
+  "aggs": {
+    "avg_grade": {
+      "avg": {
+        "field": "rating"
+      }
+    }
+  }
+}

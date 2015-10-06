@@ -1,0 +1,25 @@
+mglass_users:
+    driver: pdo_mysql
+    host: mysql
+    username: mglass
+    password: mglass
+    dbname: mglass
+mglass_movies:
+    driver: pdo_mysql
+    host: mysql
+    username: mglass
+    password: mglass
+    dbname: mglass
+mglass_ratings:
+    driver: pdo_mysql
+    host: mysql
+    username: mglass
+    password: mglass
+    dbname: mglass
+mglass_reviews:
+    driver: pdo_mysql
+    host: mysql
+    username: mglass
+    password: mglass
+    dbname: mglass
+

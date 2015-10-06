@@ -1,0 +1,9 @@
+mglass_movies:
+    driver: elastic
+    host: elasticsearch
+    port: 9200
+    index: mglass
+    types:
+        movies: movies
+        ratings: ratings
+        recommendations: recommendations

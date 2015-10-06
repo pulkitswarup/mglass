@@ -1,0 +1,32 @@
+#Apache Mahout
+
+mahout itemsimilarity \
+  --input ratings.dat \
+  --output mloutput \
+  --similarityClassname SIMILARITY_LOGLIKELIHOOD \
+  --booleanData TRUE \
+  --tempDir /tmp
+
+# Change to app/mglass directory where mglass code resides
+
+#Start Elastic
+docker run -d --name=elasticsearch -p 9200:9200 -v "$PWD/data/es":/usr/share/elasticsearch/data -v "$PWD/plugins/es":/usr/share/elasticsearch/plugins elasticsearch
+## only in case plugin is not installed
+docker exec -it elasticsearch /usr/share/elasticsearch/bin/plugin -i elasticsearch/marvel/latest
+docker restart elasticsearch
+
+# Start MySQL
+docker run --name=mysql -d -p 3306:3306 -v "$PWD/data/mysql":/var/lib/mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw mysql
+
+# Access MySQL through Command Line
+docker run -it --link mysql:mysql --rm mysql sh -c 'exec mysql -h"$MYSQL_PORT_3306_TCP_ADDR" -P"$MYSQL_PORT_3306_TCP_PORT" -uroot -p"$MYSQL_ENV_MYSQL_ROOT_PASSWORD"'
+
+# Start Apache
+ docker run --name webserver --link mysql:mysql --link elasticsearch:elasticsearch -d -p 80:80  -v "$PWD":"/apps/mglass" mglass-app
+
+#Mahout Command
+docker run --name=mahout -it -v "$PWD/data/raw":/apps/mglass/data/raw -w /apps/mglass/data/raw --rm mahout mahout itemsimilarity   --input /apps/mglass/data/raw/ratings.dat   --output /apps/mglass/data/raw/mloutput --similarityClassname SIMILARITY_LOGLIKELIHOOD --booleanData TRUE --tempDir /tmp
+
+#Composer
+docker run -it --rm -w `pwd` -v /home/pulkit:/home/pulkit mglass-app php composer.phar update
+

@@ -1,0 +1,8 @@
+m_glass_api:
+    resource: "@MGlassApiBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+#app:
+#    resource: "@AppBundle/Controller/"
+#    type:     annotation
