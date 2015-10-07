@@ -1,0 +1,27 @@
+web:
+    container_name: mglass
+    image: reprosearch/mglass-app
+    ports:
+          - "80:80"
+    volumes:
+      - .:/apps/mglass
+    links:
+        - mysql
+        - elasticsearch
+    working_dir: /apps/mglass/
+mysql:
+    container_name: mysql
+    image: mysql:latest
+    ports:
+        - "3306:3306"
+    volumes:
+        - ./data/mysql:/var/lib/mysql
+elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:latest
+    ports:
+        - "9200:9200"
+        - "9300:9300"
+    volumes:
+        - ./data/es:/usr/share/elasticsearch/data
+        - ./plugins/es:/usr/share/elasticsearch/plugins
