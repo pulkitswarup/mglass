@@ -1,3 +1,7 @@
+# UNMAINTAINED NOTICE
+
+This is a demo project, which was built for the purpose of learning. It is no longer maintained.
+
 MGlass
 ======================
 
